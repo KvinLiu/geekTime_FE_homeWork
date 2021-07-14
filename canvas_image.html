@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Upload image and Convert image</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Place favicon.ico in the root directory -->
+  </head>
+  <body>
+    <!--[if lt IE 8]>
+      <p class="browserupgrade">
+        You are using an <strong>outdated</strong> browser. Please
+        <a href="http://browsehappy.com/">upgrade your browser</a> to improve
+        your experience.
+      </p>
+    <![endif]-->
+    <canvas id="canvas"></canvas>
+    <div>
+      <label for="upload">选择图片</label> <input type="file" id="uploader" />
+    </div>
+    <button id="greyScale">变灰</button>
+    <button id="download">下载</button>
+    <script type="text/javascript">
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const reader = new FileReader();
+      const img = new Image();
+
+      const uploadImage = (e) => {
+        reader.onload = () => {
+          img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      };
+
+      const imgLoader = document.getElementById("uploader");
+
+      imgLoader.addEventListener("change", uploadImage);
+
+      const greyScale = () => {
+        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        console.log("image Data: ", imageData);
+        let arr = imageData.data;
+        for (let i = 0; i < arr.length; i = i + 4) {
+          let ttl = arr[i] + arr[i + 1] + arr[i + 2];
+          let avg = parseInt(ttl / 3);
+          arr[i] = avg;
+          arr[i + 1] = avg;
+          arr[i + 1] = avg;
+        }
+        imageData.data = arr;
+        ctx.putImageData(imageData, 0, 0);
+      };
+
+      document.getElementById("greyScale").addEventListener("click", greyScale);
+
+      function download() {
+        const image = canvas.toDataURL();
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = "image.png";
+        link.click();
+      }
+
+      document.getElementById("download").addEventListener("click", download);
+    </script>
+  </body>
+</html>
